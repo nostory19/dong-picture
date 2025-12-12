@@ -1,0 +1,118 @@
+# ========配置server========
+server:
+  port: 8123
+  servlet:
+    context-path: /api
+    # cookie 30填过期
+    session:
+      cookie:
+        max-age: 2592000
+# ========配置spring========
+spring:
+  application:
+    # 项目名称
+    name: dong-picture-backend
+    # 数据库配置
+  datasource:
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    # 本地的该项目的数据库地址
+    url: jdbc:mysql://localhost:3306/dong_picture
+    username: root
+    password: 12345
+  # redis配置
+  redis:
+    database: 0
+    host: localhost
+    port: 6379
+    connect-timeout: 5000
+  # session配置
+  session:
+    store-type: redis
+    # session 30 天后过期
+    timeout: 2592000
+  # 开放更大的文件上传体积
+  servlet:
+    multipart:
+      max-file-size: 10MB
+  # 空间图片分表
+  shardingsphere:
+    datasource:
+      names: dong_picture
+      dong_picture:
+        type: com.zaxxer.hikari.HikariDataSource
+        driver-class-name: com.mysql.cj.jdbc.Driver
+        url: jdbc:mysql://localhost:3306/dong_picture
+        username: root
+        password: 12345
+    rules:
+      sharding:
+        tables:
+          picture:
+            # 动态分表
+            # 动态生成分表名，由动态分表管理器实现（样板代码）
+            actual-data-nodes: dong_picture.picture
+            table-strategy:
+              standard:
+                sharding-column: spaceId
+                sharding-algorithm-name: picture_sharding_algorithm
+        sharding-algorithms:
+          picture_sharding_algorithm:
+            # 基于类自定义的算法
+            type: CLASS_BASED
+            props:
+              strategy: standard
+              algorithmClassName: com.dong.dongpicturebackend.manager.sharding.PictureShardingAlgorithm
+    props:
+      # 开发阶段，打印sql语句
+      sql-show: true
+#  指定application启动方式
+  profiles:
+    active: local
+# ========配置mybatis-plus========
+mybatis-plus:
+  configuration:
+    # MyBatis 配置
+    # 将下划线转换为驼峰
+    map-underscore-to-camel-case: false
+    # 仅在开发环境打印日志
+    log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
+  global-config:
+    db-config:
+      # 逻辑删除的字段
+      logic-delete-field: isDelete
+      # 逻辑删除表示的值
+      logic-delete-value: 1
+      # 逻辑未删除
+      logic-not-delete-value: 0
+    # 使用sqlrunner
+#    enable-sql-runner: true
+# ========配置knife4j========
+# 文档查看地址 http://ip:port/doc.html
+# 本次项目的地址 http://localhost:8123/api/doc.html#/home
+knife4j:
+  enable: true # 是否开启
+  openapi:
+    title: 云图库接口文档
+    description: "`我是测试`,**你知道吗**"
+    version: v1.0
+    # 指定接口文档找到代码中的哪些接口
+    group:
+      # 手动分组
+      default:
+        api-rule: package
+        api-rule-resources:
+          - com.dong.dongpicturebackend.controller
+#      test1:
+#        group-name: 分组名称
+#        api-rule: package
+#        api-rule-resources:
+#          - com.knife4j.demo.new3
+
+# 对象存储配置
+#cos:
+#  client:
+#    host:
+#    secretId:
+#    secretKey:
+#    region:
+#    bucket:
