@@ -1,0 +1,14 @@
+# Build output
+**/target/
+
+# Node modules
+**/node_modules/
+
+# Sensitive config files (contain API keys, passwords, etc.)
+**/src/main/resources/application*.yml
+**/src/main/resources/application*.yaml
+**/conf/common-config.yml
+
+# IDE files
+**/.idea/
+*.iml
